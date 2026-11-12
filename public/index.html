@@ -1,1 +1,531 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KKA Adventure — Kelas X Fase E</title>
+<style>
+:root{--bg:#080f22;--panel:#14213b;--line:#344a70;--txt:#f4f7ff;--muted:#b8c7e3;--blue:#5b8cff;--green:#25d6a0;--gold:#ffd166;--glow:#7c9cff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 12% 0%,#203b70 0,transparent 38%),radial-gradient(ellipse at 90% 12%,#40245f 0,transparent 30%),var(--bg);color:var(--txt);font:15px system-ui,Segoe UI,sans-serif;min-height:100vh}button,input{font:inherit}button{transition:transform .16s ease,filter .16s ease,box-shadow .16s ease}button:hover{filter:brightness(1.12)}button:active{transform:scale(.98)}
+#app{max-width:1240px;margin:auto;padding:18px}.top{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:linear-gradient(115deg,#1a3157ee,#30234fee);border:1px solid #536a9c;padding:15px;border-radius:20px;margin-bottom:14px;box-shadow:0 14px 40px #0004;backdrop-filter:blur(12px)}
+.brand{font-weight:950;font-size:20px;flex:1;letter-spacing:.4px;text-shadow:0 2px 18px #8ab4ff55}.stat{background:#0b1730cc;padding:9px 13px;border:1px solid #43577c;border-radius:12px;box-shadow:inset 0 1px #ffffff0c}.btn{border:0;border-radius:11px;padding:10px 15px;background:var(--blue);color:white;font-weight:800;cursor:pointer}.btn.secondary{background:#2b3a58}.btn.green{background:#159b70}
+.layout{display:grid;grid-template-columns:1.5fr 1fr;gap:12px}.panel{background:linear-gradient(145deg,#172744f2,#111d35f2);border:1px solid var(--line);border-radius:18px;padding:16px;margin-bottom:13px;box-shadow:0 10px 28px #0003}
+canvas{display:block;width:100%;height:440px;border-radius:15px;background:linear-gradient(#9bd6ff,#c7e9ff);touch-action:none;border:1px solid #7198c8;box-shadow:0 8px 24px #0003}
+h2{font-size:18px;margin:0 0 10px}.muted{color:var(--muted);font-size:13px;line-height:1.5}.mission{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:14px;padding:11px;margin:8px 0;background:linear-gradient(100deg,#111d33,#192a49);transition:.18s}.mission:hover{border-color:#789cff;transform:translateX(2px)}.mission .emoji{font-size:27px}.mission button{margin-left:auto;white-space:nowrap}
+#quiz{display:none}.choice{display:block;width:100%;text-align:left;padding:12px;margin:8px 0;border-radius:10px;border:1px solid #465a7b;background:#111d33;color:white;cursor:pointer}.choice:hover{border-color:#9abaff;transform:translateX(2px);background:#1b2c4b}.choice:disabled{cursor:default;opacity:.95}.choice.correct{background:#124c3b;border-color:#25c58a}.choice.wrong{background:#552b39;border-color:#ff6b7a}
+.progress{height:8px;background:#30415f;border-radius:20px;overflow:hidden;margin:8px 0}.progress i{display:block;height:100%;background:var(--green);width:0}
+#toast{min-height:24px;color:var(--gold);font-weight:700}.controls{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+input{background:#101a30;color:white;border:1px solid var(--line);border-radius:9px;padding:10px;width:100%;margin:5px 0}
+@media(max-width:760px){#app{padding:10px}.layout{grid-template-columns:1fr}canvas{height:340px}.brand{min-width:100%}.top{border-radius:15px}.stat{flex:1;text-align:center}}
 
+.gamehub{margin:12px 0 14px;background:linear-gradient(125deg,#1b3156f5,#1c2147f5);border-color:#536ca0}.gamehub h2{font-size:21px}.gamegrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.gamecard{position:relative;text-align:left;min-height:150px;padding:15px;border-radius:17px;border:1px solid #526894;background:linear-gradient(145deg,#19294a,#121d37);color:#fff;cursor:pointer;transition:.2s;display:flex;flex-direction:column;gap:7px;box-shadow:0 8px 20px #0002}
+.gamecard:hover{transform:translateY(-4px);border-color:#a9c5ff;background:linear-gradient(145deg,#263d68,#1c2b4c);box-shadow:0 14px 28px #0004}
+.gamecard .gemoji{font-size:32px;line-height:1.1;filter:drop-shadow(0 4px 8px #0005)}.gamecard b{font-size:16px}.gamecard small{font-size:12px;line-height:1.4;color:#c6d4ff}
+.gamecard.blue{border-left:6px solid #438bff}.gamecard.green{border-left:6px solid #24c779}.gamecard.cyan{border-left:6px solid #08bfd0}.gamecard.purple{border-left:6px solid #a855f7}.gamecard.gold{border-left:6px solid #f5c400}.gamecard.orange{border-left:6px solid #ff781c}
+.gbadge{position:absolute;right:9px;top:9px;border-radius:20px;padding:3px 7px;background:#a855f7;font-size:10px;font-weight:900}
+#miniGame{display:none;position:fixed;inset:0;z-index:30;background:#050914ed;align-items:center;justify-content:center;padding:10px}
+.miniBox{width:min(1080px,100%);max-height:96vh;overflow:auto;background:linear-gradient(145deg,#17294b,#0c1530);border:2px solid #668bd0;border-radius:22px;padding:16px;box-shadow:0 24px 90px #000b;animation:popIn .22s ease}@keyframes popIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+.miniTop{display:flex;align-items:center;gap:10px}.miniTop h2{flex:1}.miniQuestion{font-size:19px;font-weight:800;line-height:1.45;margin:18px 0}
+.miniMeta{display:flex;gap:8px;flex-wrap:wrap}.miniMeta span{background:#101a34;padding:7px 10px;border-radius:9px;font-size:13px}
+.miniProgress{height:10px;border-radius:20px;background:#34415f;overflow:hidden;margin:12px 0}.miniProgress i{display:block;height:100%;width:0;background:#29ce91;transition:width .2s}
+.miniFeedback{min-height:42px;color:#d5e2ff;font-size:14px;line-height:1.5;margin-top:8px}
+.miniActions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:12px}
+
+.miniWorld{height:340px;position:relative;overflow:hidden;border-radius:16px;border:2px solid #5579b8;background:linear-gradient(#77c9ff,#d8f4ff);box-shadow:inset 0 -30px 60px #0a1b3a55}#mini3d{width:100%;height:100%;display:block}.worldCaption{position:absolute;left:12px;bottom:10px;padding:7px 11px;border-radius:10px;background:#07152bd9;color:#fff;font-size:12px;font-weight:900}.worldHint{position:absolute;right:12px;top:10px;padding:7px 10px;border-radius:10px;background:#07152bd9;color:#fff;font-size:11px}.miniPlayArea{display:grid;grid-template-columns:1.1fr .9fr;gap:14px;margin-top:12px}.miniQuestionCard,.miniAnswerCard{background:linear-gradient(145deg,#1b3157,#101d39);border:1px solid #405d91;border-radius:15px;padding:14px}.miniAnswerCard .choice{margin:5px 0;padding:11px;border-radius:12px;font-weight:750}.miniControls{position:absolute;right:12px;bottom:10px;display:flex;gap:6px}.miniControls button{border:1px solid #ffffff88;background:#14284be8;color:white;border-radius:10px;padding:9px 13px;font-weight:900;min-width:42px;touch-action:manipulation}.miniControls button:active{transform:translateY(2px);background:#2878ef}@media(max-width:700px){.miniWorld{height:245px}.miniPlayArea{grid-template-columns:1fr;gap:8px}.miniBox{padding:10px}}
+
+@media(max-width:760px){.gamegrid{grid-template-columns:repeat(2,minmax(0,1fr))}.gamecard{min-height:150px}}
+@media(max-width:420px){.gamegrid{grid-template-columns:1fr 1fr}.gamecard{padding:10px}.gamecard b{font-size:14px}.gamecard small{font-size:11px}}
+
+.gamecard.is-played{opacity:.48;filter:grayscale(.9);cursor:not-allowed;position:relative}
+.gamecard.is-played:hover{transform:none;box-shadow:none}
+.playedBadge{display:inline-block;margin-top:8px;padding:5px 8px;border-radius:7px;background:#334155;color:#e2e8f0;font-size:10px;font-weight:900;letter-spacing:.3px}
+.gamecard.game-locked{opacity:.42;filter:grayscale(.85);cursor:not-allowed;position:relative}
+.gamecard.game-locked:hover{transform:none;box-shadow:none}
+.onlineLockBadge{display:inline-block;margin-top:8px;padding:5px 8px;border-radius:7px;background:#4a2740;color:#ffe0ef;font-size:10px;font-weight:900;letter-spacing:.3px}
+</style>
+</head>
+<body><div id="app">
+<div class="top"><div class="brand">🚀 KKA ADVENTURE <span style="color:#ffc857">| KELAS X FASE E</span></div><div class="stat">⭐ Skor: <b id="score">0</b></div><div class="stat">🎮 Dimainkan: <b id="miniDoneCount">0/6</b></div><div class="stat">🏆 Berhasil: <b id="miniSuccessCount">0/6</b></div><div class="stat">🏅 Level: <b id="level">1</b></div><div class="stat">👥 Online: <b id="onlineCount">1</b></div><button class="btn secondary" onclick="showHelp()">Petunjuk</button></div>
+
+<div class="panel gamehub">
+  <h2>🎮 Arena Mini Game KKA</h2>
+  <p class="muted">Pilih permainan singkat. Kumpulkan XP, naikkan level, dan tuntaskan semua tantangan logika, algoritma, data, pemrograman, serta kecerdasan artifisial.</p>
+  <div class="gamegrid">
+    <button class="gamecard blue" onclick="openMiniGame('jelajah')"><span class="gemoji">🌍</span><b>Jelajah Dunia Digital</b><small>Jelajahi zona teknologi dan pecahkan tantangan KKA.</small></button>
+    <button class="gamecard green" onclick="openMiniGame('lari')"><span class="gemoji">🏃</span><b>Lari Kilat Koding</b><small>Jawab cepat sebelum waktu habis. Kumpulkan poin sebanyak mungkin.</small><span class="gbadge">30 DETIK</span></button>
+    <button class="gamecard cyan" onclick="openMiniGame('jatuh')"><span class="gemoji">🤸</span><b>Jatuh Bangun Algoritma</b><small>Susun langkah program dengan urutan yang benar.</small></button>
+    <button class="gamecard purple" onclick="openMiniGame('detektif')"><span class="gemoji">🕵️</span><b>Detektif Kota Ilmu</b><small>Baca petunjuk, analisis data, dan temukan solusi kasus.</small><span class="gbadge">BARU</span></button>
+    <button class="gamecard gold" onclick="openMiniGame('pasar')"><span class="gemoji">🏪</span><b>Pasar Data Nusantara</b><small>Kelola anggaran, hitung data, dan pilih keputusan paling tepat.</small><span class="gbadge" style="background:#eab308;color:#201700">BARU</span></button>
+    <button class="gamecard orange" onclick="openMiniGame('jembatan')"><span class="gemoji">🌉</span><b>Jembatan Juara</b><small>Jawab tantangan beruntun untuk membangun jembatan sampai FINISH.</small></button>
+  </div>
+</div>
+
+<div class="layout">
+<section>
+<div class="panel"><h2>🌐 Dunia KKA</h2><canvas id="world"></canvas><div class="muted">Gerakkan avatar dengan tombol WASD / panah. Di HP, gunakan tombol arah. Setiap materi kini berupa gedung. Dekati gedung materi lalu tekan tombol Masuk Misi.</div>
+<div class="controls"><button class="btn secondary" data-move="left">◀</button><button class="btn secondary" data-move="up">▲</button><button class="btn secondary" data-move="down">▼</button><button class="btn secondary" data-move="right">▶</button><button class="btn green" id="enter" disabled>Masuk Misi</button></div><div id="toast"></div></div>
+<div class="panel"><h2>📚 Peta Pembelajaran</h2><div id="missions"></div></div>
+</section>
+<aside>
+<div class="panel"><h2>🌍 Main Bersama</h2><label class="muted">Nama pemain</label><input id="playerName" maxlength="18" placeholder="Masukkan nama"><label class="muted">Kode ruang (semua teman harus sama)</label><input id="roomCode" maxlength="20" value="KELAS10" placeholder="Contoh: KELAS10"><button class="btn green" id="joinOnline">Gabung Ruang Online</button><p id="connectionStatus" class="muted">Belum terhubung. Jalankan server game untuk bermain bersama.</p><div class="muted">Pemain di ruang ini:</div><div id="playersList" class="muted">Belum ada pemain lain.</div></div>
+<div class="panel"><h2>💬 Obrolan Kelas</h2><div id="chatMessages" style="height:130px;overflow:auto;background:#101a30;border-radius:10px;padding:8px;margin-bottom:8px" class="muted">Obrolan akan muncul setelah terhubung.</div><div style="display:flex;gap:6px"><input id="chatInput" maxlength="180" placeholder="Tulis pesan..." style="margin:0"><button class="btn" id="sendChat">Kirim</button></div></div>
+<div class="panel"><h2>🎯 Target Belajar</h2><div class="muted">• Memahami berpikir komputasional dan pemecahan masalah.<br>• Menyusun algoritma dan mengenali logika pemrograman.<br>• Memahami data serta cara kerja dasar AI.<br>• Menggunakan AI secara kritis, aman, dan bertanggung jawab.</div></div>
+<div class="panel"><h2>📊 Progres Misi</h2><div class="progress"><i id="bar"></i></div><b id="done">0 dari 6 misi selesai</b><p class="muted">Setiap mini game berisi 10 soal. Jawaban benar membawa avatar ke tahap berikutnya.</p></div>
+<div class="panel" id="quiz"><h2 id="qtitle">Misi</h2><div class="muted" id="qcount"></div><p id="question"></p><div id="choices"></div><div id="feedback" class="muted"></div><button class="btn" id="next" style="display:none">Lanjut</button></div>
+</aside></div></div>
+
+<div id="miniGame" role="dialog" aria-modal="true" aria-labelledby="miniTitle"><div class="miniBox">
+<div class="miniTop"><h2 id="miniTitle">🎮 Mini Game 3D</h2><button class="btn secondary" onclick="closeMiniGame()">Keluar ✕</button></div>
+<div class="miniMeta"><span id="miniMode">Mode permainan</span><span>⭐ Poin: <b id="miniPoints">0</b></span><span id="miniTimer" style="display:none">⏱️ 30</span><span>🔥 Streak: <b id="miniStreak">0</b></span></div>
+<div class="miniProgress"><i id="miniBar"></i></div><div class="miniWorld"><canvas id="mini3d"></canvas><div class="worldCaption" id="worldCaption">KKA 3D ADVENTURE</div><div class="worldHint" id="worldHint">🎮 Gerakkan avatar</div><div class="miniControls"><button onclick="moveMini(-1)">◀</button><button onclick="jumpMini()">⬆</button><button onclick="moveMini(1)">▶</button><button onclick="actionMini()">✨ Aksi</button></div></div>
+<div class="miniPlayArea"><section class="miniQuestionCard"><div class="muted" id="miniCount"></div><div class="miniQuestion" id="miniQuestion"></div><div class="miniFeedback" id="miniFeedback">Pilih jawaban yang tepat untuk melanjutkan petualangan.</div></section><section class="miniAnswerCard"><div class="muted" style="font-weight:800;margin-bottom:6px">🧠 PILIH JAWABAN</div><div id="miniChoices"></div></section></div>
+<div class="miniActions"><button class="btn" id="miniNext" style="display:none" onclick="miniNext()">Lanjut</button></div></div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const topics=[
+{n:"Berpikir Komputasional",e:"🧩",c:0x4f8cff,desc:"Dekomposisi, pola, abstraksi, dan algoritma.",q:[
+["Memecah masalah besar menjadi bagian-bagian kecil disebut…",["Dekomposisi","Abstraksi","Enkripsi","Simulasi"],0,"Dekomposisi membantu masalah kompleks lebih mudah diselesaikan."],
+["Mencari kesamaan dari beberapa masalah merupakan…",["Pengenalan pola","Pengurutan","Kompilasi","Instalasi"],0,"Pengenalan pola menemukan kemiripan agar solusi dapat digunakan kembali."],
+["Memusatkan perhatian pada informasi penting dan mengabaikan detail yang tidak relevan disebut…",["Abstraksi","Duplikasi","Deklarasi","Distribusi"],0,"Abstraksi menyederhanakan masalah dengan memilih informasi yang penting."]
+]},
+{n:"Algoritma & Logika",e:"🔀",c:0xf59e0b,desc:"Urutan langkah, percabangan, dan perulangan.",q:[
+["Urutan langkah logis untuk menyelesaikan masalah disebut…",["Algoritma","Perangkat keras","Jaringan","Variabel"],0,"Algoritma adalah langkah-langkah terstruktur untuk menyelesaikan masalah."],
+["Struktur IF–ELSE digunakan untuk…",["Percabangan keputusan","Mengulang tanpa henti","Menyimpan gambar","Menghapus file"],0,"IF–ELSE memilih tindakan berdasarkan kondisi."],
+["Perintah yang dijalankan berulang selama kondisi terpenuhi disebut…",["Perulangan","Percabangan","Input","Output"],0,"Perulangan atau loop menjalankan instruksi berulang berdasarkan aturan."]
+]},
+{n:"Data & Informasi",e:"📊",c:0x14b8a6,desc:"Jenis data, pengolahan, dan kualitas data.",q:[
+["Data yang telah diolah sehingga memiliki makna disebut…",["Informasi","Kode sumber","Perangkat","Algoritma"],0,"Informasi adalah hasil pengolahan data yang bermakna."],
+["Contoh data numerik adalah…",["Umur 16 tahun","Nama siswa","Alamat rumah","Warna favorit"],0,"Umur dinyatakan dalam angka sehingga termasuk data numerik."],
+["Mengapa data perlu diperiksa sebelum digunakan AI?",["Agar akurat dan tidak bias","Agar ukuran layar besar","Agar komputer berwarna","Agar internet mati"],0,"Data yang keliru atau bias dapat menghasilkan keluaran AI yang keliru."]
+]},
+{n:"Dasar Pemrograman",e:"💻",c:0x8b5cf6,desc:"Variabel, tipe data, input, output, dan debugging.",q:[
+["Tempat untuk menyimpan nilai dalam program disebut…",["Variabel","Monitor","Folder","Browser"],0,"Variabel menyimpan data yang dapat digunakan program."],
+["Tipe data untuk nilai benar atau salah adalah…",["Boolean","String","Float","Char"],0,"Boolean memiliki dua nilai: true atau false."],
+["Kegiatan mencari dan memperbaiki kesalahan program disebut…",["Debugging","Browsing","Uploading","Formatting"],0,"Debugging membantu menemukan penyebab kesalahan dan memperbaikinya."]
+]},
+{n:"Kecerdasan Artifisial",e:"🤖",c:0xec4899,desc:"Konsep AI, machine learning, dan penerapannya.",q:[
+["Kecerdasan artifisial (AI) adalah teknologi yang…",["Membantu sistem melakukan tugas yang membutuhkan kecerdasan","Selalu menggantikan manusia","Hanya digunakan untuk bermain gim","Tidak membutuhkan data"],0,"AI memungkinkan sistem melakukan tugas seperti mengenali pola atau memahami bahasa."],
+["Machine learning merupakan pendekatan AI yang membuat sistem…",["Belajar pola dari data","Hanya mengikuti kabel jaringan","Tidak memerlukan contoh","Selalu benar"],0,"Machine learning mempelajari pola dari data untuk membuat prediksi atau keputusan."],
+["Contoh penerapan AI dalam kehidupan sehari-hari adalah…",["Rekomendasi video","Penggaris kayu","Buku tulis kosong","Kabel listrik biasa"],0,"Sistem rekomendasi memanfaatkan data dan algoritma untuk menyarankan konten."]
+]},
+{n:"Etika & Keamanan Digital",e:"🛡️",c:0x22c55e,desc:"Privasi, bias, verifikasi, dan tanggung jawab AI.",q:[
+["Saat menggunakan AI untuk tugas sekolah, tindakan yang tepat adalah…",["Memeriksa hasil dan mencantumkan bantuan AI sesuai aturan","Menyalin semua hasil tanpa membaca","Membagikan kata sandi","Menganggap semua jawaban pasti benar"],0,"Keluaran AI perlu diverifikasi dan digunakan secara jujur."],
+["Informasi pribadi yang sebaiknya tidak dimasukkan ke layanan AI publik adalah…",["Kata sandi dan nomor identitas","Topik pelajaran umum","Pertanyaan matematika","Contoh algoritma sederhana"],0,"Data sensitif harus dijaga agar tidak disalahgunakan."],
+["Jika data pelatihan tidak mewakili semua kelompok, AI berisiko menghasilkan…",["Bias","Baterai penuh","Resolusi tinggi","Jaringan lebih cepat"],0,"Data yang tidak seimbang dapat menyebabkan hasil AI tidak adil."]
+]}
+];
+let score=0,done=new Set(),miniDone=new Set(),miniPlayed=new Set(),active=-1,qi=0,locked=false,near=-1,name="Petualang",currentQ=null;
+const MINI_PLAYED_STORAGE_KEY="kkaAdventureMiniPlayedV9";
+let onlineSessionReady=false;
+const MINI_RESULT_STORAGE_KEY="kkaAdventureMiniResultsV10";
+let miniResults={};
+// Progres mini game berlaku untuk satu sesi siswa. Saat siswa baru bergabung,
+ // semua mini game kembali tersedia meskipun memakai link/localhost yang sama.
+ miniPlayed=new Set();miniResults={};
+function saveMiniPlayed(){/* Status hanya berlaku selama sesi pemain saat ini. Tidak dikunci permanen di localhost. */}
+function resetMiniGamesForNewStudent(){
+ miniPlayed=new Set();miniResults={};miniDone=new Set();
+ // Bersihkan kunci versi lama agar siswa yang membuka link yang sama tetap mendapat game baru.
+ try{localStorage.removeItem(MINI_PLAYED_STORAGE_KEY);localStorage.removeItem(MINI_RESULT_STORAGE_KEY)}catch(e){}
+ renderMiniGameCards();update();
+}
+function renderMiniGameCards(){
+ document.querySelectorAll('.gamecard[onclick^="openMiniGame"]').forEach(card=>{
+  const match=card.getAttribute("onclick").match(/openMiniGame\('([^']+)'\)/);
+  if(!match)return;
+  const key=match[1],played=miniPlayed.has(key),blocked=!onlineSessionReady;
+  // Setelah berhasil bergabung, semua mini game yang belum dimainkan harus langsung terbuka.
+  card.classList.toggle("is-played",played);
+  card.classList.toggle("game-locked",blocked&&!played);
+  card.setAttribute("aria-disabled",(played||blocked)?"true":"false");
+  let badge=card.querySelector(".playedBadge");
+  if(played&&!badge){badge=document.createElement("span");badge.className="playedBadge";badge.textContent=miniResults[key]==="success"?"🏆 SELESAI":"🔒 KESEMPATAN HABIS";card.appendChild(badge)}
+  if(!played&&badge)badge.remove();
+  let lockBadge=card.querySelector(".onlineLockBadge");
+  if(blocked&&!played&&!lockBadge){lockBadge=document.createElement("span");lockBadge.className="onlineLockBadge";lockBadge.textContent="🔒 ISI NAMA & GABUNG ONLINE";card.appendChild(lockBadge)}
+  if((!blocked||played)&&lockBadge)lockBadge.remove();
+ });
+ const counter=$("miniDoneCount");if(counter)counter.textContent=miniPlayed.size+"/6 dimainkan";
+ const successCounter=$("miniSuccessCount");if(successCounter)successCounter.textContent=Object.values(miniResults).filter(v=>v==="success").length+"/6";
+}
+function shuffleQuestion(q){const opts=q[1].map((text,index)=>({text,index}));for(let i=opts.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[opts[i],opts[j]]=[opts[j],opts[i]];}return {prompt:q[0],options:opts.map(o=>o.text),correct:opts.findIndex(o=>o.index===q[2]),explain:q[3]};}
+const $=id=>document.getElementById(id);
+function sendProgress(){if(socket?.connected)socket.emit("student-progress",{done:[...done],miniDone:[...miniDone],currentMission:active>=0?topics[active].n:"-",answered:window.kkaAnswered||0,correct:window.kkaCorrect||0});}
+function update(){ $("score").textContent=score;$("level").textContent=1+Math.floor(score/60);$("miniDoneCount").textContent=miniPlayed.size+"/6 dimainkan";const _msc=$("miniSuccessCount");if(_msc)_msc.textContent=Object.values(miniResults).filter(v=>v==="success").length+"/6";$("done").textContent=done.size+" dari 6 misi selesai";$("bar").style.width=(done.size/6*100)+"%";renderMissions();renderMiniGameCards()}
+function renderMissions(){$("missions").innerHTML=topics.map((t,i)=>`<div class="mission"><span class="emoji">${t.e}</span><div><b>${i+1}. ${t.n}</b><div class="muted">${t.desc}</div></div><button class="btn ${done.has(i)?"green":"secondary"}" onclick="startMission(${i})">${done.has(i)?"Ulangi":"Misi"}</button></div>`).join("")}
+function saveName(){name=$("playerName").value.trim()||"Petualang";$("toast").textContent="Selamat datang, "+name+"!"}
+function showHelp(){alert("Petunjuk bermain:\\n1. Gerakkan avatar dengan WASD/panah atau tombol layar.\\n2. Kunjungi gedung materi dan tekan Masuk Misi.\\n3. Jawab 3 soal di setiap zona.\\n4. Jawaban benar mendapat 10 poin.\\n5. Selesaikan keenam misi!")}
+function startMission(i){active=i;qi=0;locked=false;sendProgress();$("quiz").style.display="block";showQuestion();$("quiz").scrollIntoView({behavior:"smooth",block:"nearest"})}
+function showQuestion(){const t=topics[active];currentQ=shuffleQuestion(t.q[qi]);$("qtitle").textContent=t.e+" "+t.n;$("qcount").textContent="Soal "+(qi+1)+" dari 3 • Pilihan diacak";$("question").textContent=currentQ.prompt;$("feedback").textContent="";$("next").style.display="none";$("choices").innerHTML="";currentQ.options.forEach((v,j)=>{let b=document.createElement("button");b.className="choice";b.textContent=String.fromCharCode(65+j)+". "+v;b.onclick=()=>answer(j,b);$("choices").appendChild(b)})}
+function answer(j,btn){if(locked)return;locked=true;window.kkaAnswered=(window.kkaAnswered||0)+1;let q=currentQ,ok=j===q.correct;[...$("choices").children].forEach((b,k)=>{b.disabled=true;if(k===q.correct)b.classList.add("correct")});if(!ok)btn.classList.add("wrong");else{window.kkaCorrect=(window.kkaCorrect||0)+1;score+=10;update();if(socket?.connected)socket.emit("score-update",score)}sendProgress();$("feedback").textContent=(ok?"✅ Benar! ":"❌ Belum tepat. ")+q.explain;$("next").style.display="inline-block";$("next").textContent=qi===2?"Selesaikan misi":"Soal berikutnya"}
+$("next").onclick=()=>{if(qi<2){qi++;locked=false;showQuestion()}else{const finishedName=topics[active].n;done.add(active);active=-1;$("quiz").style.display="none";sendProgress();$("toast").textContent="🎉 Misi "+finishedName+" selesai!";update();if(done.size===6)setTimeout(()=>alert("🏆 Hebat, "+name+"! Semua misi KKA Fase E selesai. Total skor: "+score),200)}};
+let scene,camera,renderer,player,portals=[],keys={},yaw=0;
+let socket=null,remotePlayers=new Map(),joinedRoom="",lastSent=0;
+function block(w,h,d,color,x,y,z){let m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshStandardMaterial({color}));m.position.set(x,y,z);scene.add(m);return m}
+function makeAvatar(color=0xf1c27d, shirtColor=0x2878e8){
+ const g=new THREE.Group(),skin=new THREE.MeshStandardMaterial({color}),shirt=new THREE.MeshStandardMaterial({color:shirtColor}),pants=new THREE.MeshStandardMaterial({color:0x263b70}),shoe=new THREE.MeshStandardMaterial({color:0x202638}),face=new THREE.MeshStandardMaterial({color:0x171717});
+ const torso=new THREE.Mesh(new THREE.BoxGeometry(1.55,1.65,.78),shirt);torso.position.y=2.75;g.add(torso);
+ const head=new THREE.Mesh(new THREE.BoxGeometry(1.25,1.25,1.12),skin);head.position.y=4.25;g.add(head);
+ const hair=new THREE.Mesh(new THREE.BoxGeometry(1.3,.32,1.16),new THREE.MeshStandardMaterial({color:0x3a2518}));hair.position.y=4.93;g.add(hair);
+ for(const x of [-.3,.3]){const eye=new THREE.Mesh(new THREE.BoxGeometry(.12,.15,.06),face);eye.position.set(x,4.3,.59);g.add(eye)}
+ const arms=[],legs=[];for(const side of [-1,1]){const a=new THREE.Group();a.position.set(side*1.02,3.35,0);const am=new THREE.Mesh(new THREE.BoxGeometry(.58,1.35,.62),skin);am.position.y=-.68;a.add(am);const hand=new THREE.Mesh(new THREE.BoxGeometry(.58,.42,.62),skin);hand.position.y=-1.48;a.add(hand);g.add(a);arms.push(a);const l=new THREE.Group();l.position.set(side*.43,1.95,0);const lm=new THREE.Mesh(new THREE.BoxGeometry(.66,1.35,.7),pants);lm.position.y=-.66;l.add(lm);const f=new THREE.Mesh(new THREE.BoxGeometry(.72,.38,1),shoe);f.position.set(0,-1.42,.16);l.add(f);g.add(l);legs.push(l)}
+ return {group:g,arms,legs};
+}
+function addNameTag(text){const c=document.createElement("canvas");c.width=512;c.height=100;const x=c.getContext("2d");x.fillStyle="rgba(16,26,48,.88)";x.fillRect(0,0,512,100);x.fillStyle="white";x.font="bold 42px Arial";x.textAlign="center";x.textBaseline="middle";x.fillText(String(text).slice(0,18),256,50);const t=new THREE.CanvasTexture(c);const m=new THREE.Sprite(new THREE.SpriteMaterial({map:t,depthTest:false}));m.scale.set(4.5,.9,1);m.position.y=5.7;return m}
+function connectOnline(){
+ const rawName=$("playerName").value.trim();
+ if(!rawName){onlineSessionReady=false;renderMiniGameCards();$("connectionStatus").textContent="🔴 Isi nama siswa terlebih dahulu sebelum bergabung online."; $("playerName").focus();return}
+ if(!window.io){$("connectionStatus").textContent="Server Socket.IO belum tersedia. Buka game melalui server, bukan dengan klik file HTML.";return}
+ const playerName=($("playerName").value.trim()||"Petualang").slice(0,18),room=($("roomCode").value.trim()||"KELAS10").replace(/[^a-zA-Z0-9_-]/g,"").slice(0,20)||"KELAS10";
+ if(socket)socket.disconnect();joinedRoom=room;name=playerName;socket=io();$("connectionStatus").textContent="Menghubungkan ke server...";
+ socket.on("connect",()=>socket.emit("join-room",{room,name:playerName,score}));
+ socket.on("joined",data=>{resetMiniGamesForNewStudent();onlineSessionReady=true;renderMiniGameCards();$("playerName").disabled=true;$("roomCode").disabled=true;$("joinOnline").textContent="✓ Sudah Bergabung";$("joinOnline").disabled=true;if(socket?.connected)socket.emit("score-update",score);sendProgress();$("connectionStatus").textContent="🟢 Terhubung • Ruang "+data.room+" • Mini game terbuka";$("onlineCount").textContent=data.players.length;$("playersList").textContent=data.players.map(p=>p.name+" ("+p.score+" poin)").join(" • ")||"Kamu pemain pertama.";data.players.forEach(p=>{if(p.id!==socket.id)upsertRemote(p)})});
+ socket.on("player-joined",p=>{upsertRemote(p);addChat("🌟",p.name+" bergabung")});
+ socket.on("player-moved",p=>upsertRemote(p));
+ socket.on("player-left",p=>{const old=remotePlayers.get(p.id);if(old){scene.remove(old.group);remotePlayers.delete(p.id)};addChat("👋",p.name+" keluar");updateOnlineList()});
+ socket.on("room-players",list=>{list.forEach(upsertRemote);$("onlineCount").textContent=list.length+1;$("playersList").textContent=list.map(p=>p.name+" ("+p.score+" poin)").join(" • ")||"Kamu pemain pertama."});
+ socket.on("chat",m=>addChat(m.name,m.message));socket.on("disconnect",()=>{onlineSessionReady=false;renderMiniGameCards();if(!$("miniGame")||$("miniGame").style.display!=="flex")$("connectionStatus").textContent="🔴 Koneksi terputus. Mini game dikunci sampai terhubung kembali."});
+ socket.on("connect_error",()=>{onlineSessionReady=false;renderMiniGameCards();$("connectionStatus").textContent="🔴 Gagal terhubung. Periksa alamat server dan koneksi internet."});
+}
+function upsertRemote(p){if(!scene||p.id===socket?.id)return;let r=remotePlayers.get(p.id);if(!r){const av=makeAvatar(0xf1c27d,0x16a6a0);av.group.add(addNameTag(p.name));scene.add(av.group);r=av;remotePlayers.set(p.id,r)}r.group.position.set(p.x||0,0,p.z||0);r.group.rotation.y=p.rotation||0;r.name=p.name;r.score=p.score||0;const walking=!!p.moving,swing=walking?Math.sin(Date.now()*.012)*.5:0;r.arms.forEach((a,i)=>a.rotation.x=walking?(i===0?swing:-swing):0);r.legs.forEach((l,i)=>l.rotation.x=walking?(i===0?-swing:swing):0);updateOnlineList()}
+function updateOnlineList(){const arr=[...remotePlayers.values()];$("onlineCount").textContent=arr.length+1;$("playersList").textContent=arr.map(p=>p.name+" ("+p.score+" poin)").join(" • ")||"Kamu pemain pertama."}
+function addChat(who,msg){const box=$("chatMessages"),line=document.createElement("div");line.textContent=who+": "+msg;box.appendChild(line);while(box.children.length>40)box.removeChild(box.firstChild);box.scrollTop=box.scrollHeight}
+function sendChat(){const input=$("chatInput"),msg=input.value.trim();if(!msg||!socket?.connected)return;socket.emit("chat-message",msg);input.value=""}
+function init3D(){const canvas=$("world");if(!window.THREE){canvas.style.display="none";$("toast").textContent="Tampilan 3D memerlukan koneksi internet.";return}
+scene=new THREE.Scene();scene.background=new THREE.Color(0x9bd6ff);scene.fog=new THREE.Fog(0x9bd6ff,45,100);
+camera=new THREE.PerspectiveCamera(55,canvas.clientWidth/440,.1,200);renderer=new THREE.WebGLRenderer({canvas,antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.setSize(canvas.clientWidth,440,false);
+scene.add(new THREE.HemisphereLight(0xffffff,0x567044,1.5));let sun=new THREE.DirectionalLight(0xffffff,1.2);sun.position.set(15,30,10);scene.add(sun);
+block(130,1,130,0x62bd67,0,-.6,0);
+for(let i=0;i<28;i++){let x=(Math.random()-.5)*110,z=(Math.random()-.5)*110;if(Math.hypot(x,z)<16)continue;block(1.2,3+Math.random()*3,1.2,0x805b3b,x,1,z);let crown=new THREE.Mesh(new THREE.ConeGeometry(2.3,5,7),new THREE.MeshStandardMaterial({color:0x218b50}));crown.position.set(x,5,z);scene.add(crown)}
+const colors=topics.map(t=>t.c);
+// Setiap materi dibuat menjadi gedung kecil dengan atap, pintu, jendela, dan papan nama.
+function makeLabel(text,color){
+  const c=document.createElement("canvas");c.width=512;c.height=128;
+  const ctx=c.getContext("2d");ctx.fillStyle="#17233b";ctx.fillRect(0,0,512,128);
+  ctx.strokeStyle="#ffffff";ctx.lineWidth=8;ctx.strokeRect(5,5,502,118);
+  ctx.fillStyle="#ffffff";ctx.font="bold  thirtypx Arial";
+  ctx.font="bold 30px Arial";ctx.textAlign="center";ctx.textBaseline="middle";
+  ctx.fillText(text.length>25?text.slice(0,23)+"…":text,256,64);
+  const tex=new THREE.CanvasTexture(c);tex.anisotropy=4;
+  return new THREE.Mesh(new THREE.PlaneGeometry(7.2,1.8),new THREE.MeshBasicMaterial({map:tex,side:THREE.DoubleSide}));
+}
+function makeBuilding(t,i,x,z){
+  const g=new THREE.Group();g.position.set(x,0,z);scene.add(g);
+  const wall=new THREE.MeshStandardMaterial({color:t.c});
+  const trim=new THREE.MeshStandardMaterial({color:0xf4e7c3});
+  const dark=new THREE.MeshStandardMaterial({color:0x26364f});
+  const roof=new THREE.MeshStandardMaterial({color:new THREE.Color(t.c).multiplyScalar(.62)});
+  // alas dan badan gedung
+  let base=new THREE.Mesh(new THREE.BoxGeometry(9,.65,8),trim);base.position.y=.35;g.add(base);
+  let body=new THREE.Mesh(new THREE.BoxGeometry(8,5.3,7),wall);body.position.y=3.25;g.add(body);
+  let top=new THREE.Mesh(new THREE.BoxGeometry(9,.55,8),roof);top.position.y=6.15;g.add(top);
+  // lis depan, pintu, dan jendela
+  let door=new THREE.Mesh(new THREE.BoxGeometry(1.5,2.7,.18),dark);door.position.set(0,1.7,3.58);g.add(door);
+  for(let wx of [-2.55,2.55]){
+    let win=new THREE.Mesh(new THREE.BoxGeometry(1.55,1.55,.2),new THREE.MeshStandardMaterial({color:0x9fe8ff,metalness:.15,roughness:.25}));
+    win.position.set(wx,3.8,3.58);g.add(win);
+    let frame=new THREE.Mesh(new THREE.BoxGeometry(1.8,1.8,.12),trim);frame.position.set(wx,3.8,3.67);g.add(frame);
+    let glass=new THREE.Mesh(new THREE.BoxGeometry(1.48,1.48,.08),new THREE.MeshStandardMaterial({color:0x8bdcff,transparent:true,opacity:.8}));
+    glass.position.set(wx,3.8,3.76);g.add(glass);
+  }
+  // papan nama gedung
+  const sign=makeLabel(t.n,t.c);sign.position.set(0,7.65,3.8);g.add(sign);
+  // tangga depan
+  for(let s=0;s<3;s++){let step=new THREE.Mesh(new THREE.BoxGeometry(3.2,.22,.65),trim);step.position.set(0,.45+s*.12,4.15+s*.55);g.add(step)}
+  // dekorasi lampu di sisi pintu
+  for(let lx of [-1.15,1.15]){let lamp=new THREE.Mesh(new THREE.SphereGeometry(.18,12,8),new THREE.MeshStandardMaterial({color:0xffdf75,emissive:0x664400}));lamp.position.set(lx,2.7,3.85);g.add(lamp)}
+  return g;
+}
+topics.forEach((t,i)=>{let a=i/6*Math.PI*2,x=Math.sin(a)*23,z=Math.cos(a)*23;let building=makeBuilding(t,i,x,z);block(10,.35,9,0xf4f0dc,x,.05,z);let ring=new THREE.Mesh(new THREE.TorusGeometry(3,.2,8,28),new THREE.MeshStandardMaterial({color:0xffd34e,emissive:0x443000}));ring.rotation.x=Math.PI/2;ring.position.set(x,.45,z);scene.add(ring);portals.push({x,z,ring,mesh:building,i})});
+// Avatar bergaya Roblox: kepala, badan, dua tangan, dua kaki, telapak tangan, dan sepatu.
+player=new THREE.Group();
+const skin=new THREE.MeshStandardMaterial({color:0xf1c27d});
+const shirt=new THREE.MeshStandardMaterial({color:0x2878e8});
+const pants=new THREE.MeshStandardMaterial({color:0x263b70});
+const shoe=new THREE.MeshStandardMaterial({color:0x202638});
+const darkFace=new THREE.MeshStandardMaterial({color:0x171717});
+const torso=new THREE.Mesh(new THREE.BoxGeometry(1.55,1.65,.78),shirt);torso.position.y=2.75;player.add(torso);
+const head=new THREE.Mesh(new THREE.BoxGeometry(1.25,1.25,1.12),skin);head.position.y=4.25;player.add(head);
+const hair=new THREE.Mesh(new THREE.BoxGeometry(1.3,.32,1.16),new THREE.MeshStandardMaterial({color:0x3a2518}));hair.position.y=4.93;player.add(hair);
+for(let x of [-.3,.3]){let eye=new THREE.Mesh(new THREE.BoxGeometry(.12,.15,.06),darkFace);eye.position.set(x,4.3,.59);player.add(eye)}
+// Senyum sederhana
+let smile=new THREE.Mesh(new THREE.BoxGeometry(.34,.06,.05),darkFace);smile.position.set(0,4.02,.59);player.add(smile);
+const armPivots=[],legPivots=[];
+for(const side of [-1,1]){
+  const arm=new THREE.Group();arm.position.set(side*1.02,3.35,0);
+  const upper=new THREE.Mesh(new THREE.BoxGeometry(.58,1.35,.62),skin);upper.position.y=-.68;arm.add(upper);
+  const hand=new THREE.Mesh(new THREE.BoxGeometry(.58,.42,.62),skin);hand.position.y=-1.48;arm.add(hand);
+  player.add(arm);armPivots.push(arm);
+  const leg=new THREE.Group();leg.position.set(side*.43,1.95,0);
+  const thigh=new THREE.Mesh(new THREE.BoxGeometry(.66,1.35,.7),pants);thigh.position.y=-.66;leg.add(thigh);
+  const foot=new THREE.Mesh(new THREE.BoxGeometry(.72,.38,1.0),shoe);foot.position.set(0,-1.42,.16);leg.add(foot);
+  player.add(leg);legPivots.push(leg);
+}
+scene.add(player);
+player.position.set(0,0,0);canvas.addEventListener("pointerdown",()=>canvas.focus());window.addEventListener("keydown",e=>keys[e.key.toLowerCase()]=true);window.addEventListener("keyup",e=>keys[e.key.toLowerCase()]=false);
+document.querySelectorAll("[data-move]").forEach(b=>{let k=b.dataset.move,map={left:"a",right:"d",up:"w",down:"s"};b.onpointerdown=e=>{e.preventDefault();keys[map[k]]=true};b.onpointerup=b.onpointerleave=()=>keys[map[k]]=false});
+function animate(){requestAnimationFrame(animate);let dx=0,dz=0;if(keys.a||keys.arrowleft)dx-=1;if(keys.d||keys.arrowright)dx+=1;if(keys.w||keys.arrowup)dz-=1;if(keys.s||keys.arrowdown)dz+=1;let len=Math.hypot(dx,dz);if(len){dx/=len;dz/=len;player.position.x+=dx*.22;player.position.z+=dz*.22;player.rotation.y=Math.atan2(dx,dz)}
+let walking=len>0, swing=walking?Math.sin(Date.now()*.012)*.55:0;
+armPivots.forEach((p,i)=>p.rotation.x=walking?(i===0?swing:-swing):0);
+legPivots.forEach((p,i)=>p.rotation.x=walking?(i===0?-swing:swing):0);
+if(socket?.connected&&Date.now()-lastSent>80){lastSent=Date.now();socket.emit("player-update",{x:player.position.x,z:player.position.z,rotation:player.rotation.y,moving:walking,score,name})}player.position.x=Math.max(-55,Math.min(55,player.position.x));player.position.z=Math.max(-55,Math.min(55,player.position.z));near=-1;let min=999;portals.forEach(p=>{p.ring.rotation.z+=.012;let d=Math.hypot(player.position.x-p.x,player.position.z-p.z);if(d<min){min=d;near=p.i}});if(min>6)near=-1;$("enter").disabled=near<0;$("enter").textContent=near<0?"Dekati portal":"Masuk: "+topics[near].n;camera.position.set(player.position.x+13,11,player.position.z+17);camera.lookAt(player.position.x,1.8,player.position.z);renderer.render(scene,camera)}
+animate();window.addEventListener("resize",()=>{let w=canvas.clientWidth;camera.aspect=w/440;camera.updateProjectionMatrix();renderer.setSize(w,440,false)})}
+$("enter").onclick=()=>{if(near>=0)startMission(near)};
+$("joinOnline").onclick=connectOnline;$("sendChat").onclick=sendChat;$("chatInput").addEventListener("keydown",e=>{if(e.key==="Enter")sendChat()});
+
+// ===== MINI GAME TAMBAHAN =====
+const miniSets={jelajah:{title:"🌍 Jelajah Dunia Digital",mode:"10 misi eksplorasi",items:[["Kamu ingin membuat aplikasi perpustakaan. Langkah awal yang paling tepat adalah…", ["Memahami kebutuhan pengguna", "Langsung mengetik kode", "Memilih warna tombol", "Membeli komputer baru"], 0, "Kenali kebutuhan pengguna sebelum merancang solusi."], ["Peta rute digital menggunakan data lokasi. Data tersebut termasuk…", ["Data spasial/lokasi", "Data suara", "Data karakter", "Data acak"], 0, "Data lokasi menunjukkan posisi atau koordinat."], ["Saat menemukan informasi teknologi di internet, kamu sebaiknya…", ["Memeriksa sumber dan tanggalnya", "Langsung menyebarkan", "Menghapus sumber", "Menganggap semuanya benar"], 0, "Informasi digital perlu diverifikasi."], ["Gerbang digital meminta kata sandi. Tindakan paling aman adalah…", ["Menggunakan kata sandi kuat dan tidak membagikannya", "Mengirimkannya ke semua teman", "Menulisnya di komentar publik", "Memakai kata sandi yang sama untuk semua akun"], 0, "Kata sandi harus dijaga dan dibuat kuat."], ["Saat menjelajah situs, ikon gembok pada alamat situs biasanya menunjukkan…", ["Koneksi menggunakan keamanan HTTPS", "Situs pasti bebas dari semua kesalahan", "Tidak memerlukan kata sandi", "Internet sedang mati"], 0, "HTTPS membantu melindungi komunikasi data."], ["Untuk mencari informasi yang lebih akurat, sebaiknya menggunakan…", ["Kata kunci yang spesifik", "Kata yang sangat acak", "Hanya satu huruf", "Judul tanpa konteks"], 0, "Kata kunci spesifik membantu menemukan hasil relevan."], ["Sebelum mengunggah foto orang lain, kamu sebaiknya…", ["Meminta izin terlebih dahulu", "Langsung mengunggahnya", "Menghapus nama tanpa bertanya", "Mengirimkannya ke semua grup"], 0, "Privasi orang lain perlu dihormati."], ["File penting sebaiknya dicadangkan agar…", ["Data tetap tersedia jika terjadi masalah", "Komputer menjadi lebih berat", "Semua file hilang", "Tidak perlu menyimpan dokumen"], 0, "Cadangan membantu memulihkan data."], ["Saat menemukan tautan mencurigakan, tindakan tepat adalah…", ["Tidak langsung mengklik dan memeriksa sumbernya", "Segera membagikannya", "Memasukkan semua data pribadi", "Mengunduh semua lampiran"], 0, "Tautan mencurigakan perlu diwaspadai."], ["Tujuan utama menjelajah dunia digital secara bertanggung jawab adalah…", ["Menggunakan teknologi dengan aman dan bermanfaat", "Mencoba semua tautan tanpa berpikir", "Membagikan data pribadi", "Mengabaikan aturan keamanan"], 0, "Literasi digital menekankan penggunaan yang aman dan bertanggung jawab."]]},lari:{title:"🏃 Lari Kilat Koding",mode:"10 rintangan • 90 detik",time:90,items:[["Simbol untuk membandingkan apakah dua nilai sama dalam banyak bahasa pemrograman adalah…", ["==", "=", "!=", "++"], 0, "Operator == membandingkan kesamaan."], ["Nilai dari 7 % 3 adalah…", ["1", "2", "3", "4"], 0, "Modulo menghasilkan sisa pembagian."], ["Perintah untuk mengulang instruksi disebut…", ["Loop", "Print", "Input", "Comment"], 0, "Loop menjalankan instruksi berulang."], ["Tipe data untuk teks adalah…", ["String", "Boolean", "Integer", "Float"], 0, "String menyimpan kumpulan karakter."], ["Jika kondisi IF bernilai false, cabang ELSE akan…", ["Dijalankan", "Dihapus", "Diulang selamanya", "Diubah menjadi angka"], 0, "ELSE dijalankan ketika kondisi IF tidak terpenuhi."], ["Nilai Boolean hanya memiliki dua kemungkinan, yaitu…", ["True dan False", "1 dan 2", "A dan B", "Besar dan kecil"], 0, "Boolean menyatakan nilai benar atau salah."], ["Fungsi utama variabel dalam program adalah…", ["Menyimpan data yang dapat digunakan", "Menghapus layar", "Mengganti internet", "Menggambar semua ikon"], 0, "Variabel menyimpan nilai atau data."], ["Jika x = 5 lalu x = x + 2, nilai x menjadi…", ["7", "5", "2", "10"], 0, "Nilai lama 5 ditambah 2 menjadi 7."], ["Komentar pada kode digunakan untuk…", ["Memberi penjelasan bagi pembaca kode", "Menjalankan program lebih cepat", "Menghapus variabel", "Mengganti semua fungsi"], 0, "Komentar membantu menjelaskan kode."], ["Langkah terakhir setelah memperbaiki kode adalah…", ["Menguji kembali program", "Menutup tanpa menyimpan", "Menghapus semua fungsi", "Mengganti nama komputer"], 0, "Pengujian ulang memastikan perbaikan berhasil."]]},jatuh:{title:"🤸 Jatuh Bangun Algoritma",mode:"10 level • 10 soal • capai puncak",items:[["Sebelum menulis kode program, urutan kerja yang tepat adalah…", ["Pahami masalah → rancang algoritma → tulis kode → uji", "Tulis kode → tebak masalah → selesai", "Uji → hapus kebutuhan → rancang", "Publikasikan → baru mencari masalah"], 0, "Mulai dari memahami masalah, lalu rancang, implementasikan, dan uji."], ["Urutan membuat teh secara algoritmik yang benar adalah…", ["Siapkan gelas → masukkan teh → tuang air → aduk", "Aduk → minum → siapkan gelas → tuang air", "Tuang air → minum → masukkan teh → siapkan gelas", "Minum → aduk → masukkan teh → tuang air"], 0, "Langkah harus tersusun logis."], ["Urutan debugging yang baik adalah…", ["Amati error → cari penyebab → perbaiki → uji ulang", "Hapus semua kode → tutup aplikasi", "Abaikan error → publikasikan", "Ganti komputer setiap error"], 0, "Debugging dilakukan dengan mengidentifikasi, memperbaiki, lalu menguji."], ["Dalam flowchart, simbol belah ketupat digunakan untuk…", ["Keputusan atau percabangan", "Mulai/selesai", "Proses biasa", "Menghubungkan halaman"], 0, "Belah ketupat menandai keputusan berdasarkan kondisi."], ["Jika perintah diulang 3 kali, struktur yang tepat adalah…", ["Perulangan/loop", "Percabangan tunggal", "Komentar", "Deklarasi warna"], 0, "Loop menjalankan instruksi berulang."], ["Variabel digunakan untuk…", ["Menyimpan nilai atau data", "Menghias tampilan", "Mempercepat internet", "Menghapus program"], 0, "Variabel menyimpan data."], ["Setelah program selesai dibuat, langkah penting berikutnya adalah…", ["Menguji hasil dan memperbaiki kesalahan", "Langsung menghapus kode", "Menyembunyikan hasil", "Mengganti semua nama file"], 0, "Pengujian memastikan program bekerja."], ["Algoritma yang baik harus memiliki langkah yang…", ["Jelas dan berurutan", "Acak dan panjang", "Rahasia dari pengguna", "Selalu sama tanpa tujuan"], 0, "Instruksi yang jelas memudahkan pelaksanaan."], ["Jika sebuah kondisi memiliki dua kemungkinan tindakan, struktur yang sesuai adalah…", ["IF–ELSE", "Loop tanpa kondisi", "Komentar", "Variabel kosong"], 0, "IF–ELSE memilih tindakan berdasarkan kondisi."], ["Tujuan utama algoritma adalah…", ["Memberikan langkah untuk menyelesaikan masalah", "Membuat layar selalu berwarna", "Menghapus semua data", "Menggantikan pengguna"], 0, "Algoritma adalah langkah terstruktur menuju solusi."]]},detektif:{title:"🕵️ Detektif Kota Ilmu",mode:"10 bukti kasus",items:[["Kasus: aplikasi memberi rekomendasi tidak adil karena data latih hanya berasal dari satu kelompok. Penyebabnya…", ["Data tidak mewakili semua kelompok", "Monitor terlalu kecil", "Nama aplikasi terlalu panjang", "Koneksi internet cepat"], 0, "Data yang tidak beragam dapat membuat model bias."], ["Log menunjukkan program berhenti setelah menerima input kosong. Hal pertama yang perlu diperiksa adalah…", ["Validasi input", "Warna latar", "Ukuran ikon", "Nama pembuat"], 0, "Input kosong perlu ditangani."], ["Dua sumber memberi angka berbeda untuk fakta yang sama. Sikap detektif digital yang tepat adalah…", ["Bandingkan sumber dan cari data tepercaya", "Pilih angka terbesar", "Pilih sumber pertama", "Sebarkan keduanya tanpa konteks"], 0, "Bandingkan kredibilitas dan data pendukung."], ["Sebuah bug hanya muncul setelah tombol tertentu diklik. Bukti yang paling berguna adalah…", ["Langkah yang dapat mengulangi bug", "Warna tombol", "Nama pengguna secara acak", "Ukuran layar tanpa konteks"], 0, "Langkah reproduksi membantu menemukan penyebab bug."], ["Pesan kesalahan menyebutkan nama variabel yang belum ada. Kemungkinan masalahnya adalah…", ["Variabel belum didefinisikan atau salah penulisan", "Internet terlalu cepat", "Ikon terlalu besar", "Mouse rusak"], 0, "Periksa deklarasi dan ejaan variabel."], ["Untuk memeriksa apakah data berubah secara tidak sengaja, detektif digital dapat…", ["Membandingkan data sebelum dan sesudah proses", "Menghapus semua catatan", "Menebak hasilnya", "Menutup aplikasi"], 0, "Perbandingan membantu menemukan perubahan."], ["Sumber berita tidak mencantumkan penulis atau tanggal. Langkah tepat adalah…", ["Mencari sumber lain yang lebih jelas", "Langsung menjadikannya fakta", "Menyebarkannya", "Mengubah isinya sendiri"], 0, "Transparansi sumber penting untuk verifikasi."], ["Saat menguji dugaan penyebab bug, sebaiknya…", ["Mengubah satu hal dan menguji hasilnya", "Mengubah semua hal sekaligus", "Tidak mencatat perubahan", "Langsung menghapus proyek"], 0, "Perubahan bertahap memudahkan menemukan penyebab."], ["Data pelanggan tersebar ke grup publik. Masalah utama yang harus diselidiki adalah…", ["Pelanggaran privasi dan keamanan data", "Warna grup", "Jumlah emoji", "Ukuran teks"], 0, "Data pribadi harus dilindungi."], ["Setelah menemukan penyebab masalah, langkah berikutnya adalah…", ["Menerapkan perbaikan lalu menguji ulang", "Menyembunyikan masalah", "Menghapus semua bukti", "Membiarkan bug"], 0, "Perbaikan perlu diverifikasi dengan pengujian ulang."]]},pasar:{title:"🏪 Pasar Data Nusantara",mode:"10 transaksi data",items:[["Kamu punya anggaran Rp50.000. Membeli 2 kabel seharga Rp15.000 per buah. Sisa uangmu adalah…", ["Rp20.000", "Rp15.000", "Rp25.000", "Rp35.000"], 0, "2 × 15.000 = 30.000; sisa 20.000."], ["Data penjualan: Senin 10, Selasa 15, Rabu 5. Total penjualan adalah…", ["30", "25", "20", "35"], 0, "10 + 15 + 5 = 30."], ["Toko ingin mengetahui produk paling laris. Data yang paling dibutuhkan adalah…", ["Jumlah unit terjual tiap produk", "Warna dinding toko", "Nama penjaga", "Ukuran papan nama"], 0, "Jumlah unit terjual dapat dibandingkan."], ["Harga buku Rp12.000 mendapat diskon Rp2.000. Harga setelah diskon adalah…", ["Rp10.000", "Rp12.000", "Rp14.000", "Rp8.000"], 0, "Kurangi harga awal dengan nilai diskon."], ["Penjualan A=20, B=35, C=25. Produk terlaris adalah…", ["B", "A", "C", "Semua sama"], 0, "35 adalah jumlah tertinggi."], ["Jika 5 barang masing-masing Rp4.000, total biaya adalah…", ["Rp20.000", "Rp9.000", "Rp16.000", "Rp25.000"], 0, "5 × 4.000 = 20.000."], ["Stok awal 50 unit dan terjual 18 unit. Stok tersisa adalah…", ["32", "68", "18", "22"], 0, "50 − 18 = 32."], ["Untuk membuat grafik penjualan bulanan, data yang diperlukan adalah…", ["Jumlah penjualan tiap bulan", "Warna seragam pegawai", "Alamat toko", "Nama semua pelanggan"], 0, "Grafik membutuhkan data penjualan per periode."], ["Rata-rata dari 10, 20, dan 30 adalah…", ["20", "10", "30", "60"], 0, "(10 + 20 + 30) ÷ 3 = 20."], ["Keputusan bisnis berbasis data berarti…", ["Menggunakan informasi yang relevan sebelum memutuskan", "Menebak tanpa data", "Selalu mengikuti satu orang", "Mengabaikan hasil penjualan"], 0, "Data membantu membuat keputusan lebih terukur."]]},jembatan:{title:"🌉 Jembatan Juara",mode:"10 langkah menuju FINISH",items:[["Sebuah algoritma memiliki instruksi yang tidak ambigu. Artinya…", ["Setiap langkah jelas dan tidak membingungkan", "Langkah boleh ditafsirkan bebas", "Tidak memiliki tujuan", "Hanya bisa dibaca komputer"], 0, "Instruksi algoritma harus jelas."], ["Untuk membuat jembatan digital yang aman, data pribadi pengguna harus…", ["Dilindungi dan tidak dibagikan sembarangan", "Diumumkan ke semua orang", "Disimpan di chat publik", "Dikirim tanpa izin"], 0, "Privasi pengguna harus dijaga."], ["Program menghitung rata-rata 4 nilai. Operasi yang benar adalah…", ["Jumlah semua nilai dibagi 4", "Nilai terbesar dikali 4", "Nilai terkecil dikurangi 4", "Jumlah nilai ditambah 4"], 0, "Rata-rata adalah jumlah data dibagi banyak data."], ["AI menghasilkan jawaban yang tampak meyakinkan tetapi belum tentu benar. Kita perlu…", ["Memeriksa fakta dari sumber tepercaya", "Langsung percaya", "Menyebarkan tanpa cek", "Menghapus semua data"], 0, "Keluaran AI perlu diverifikasi."], ["Sebelum aplikasi dirilis, pengembang sebaiknya…", ["Menguji fitur dan memperbaiki bug", "Mengabaikan masukan", "Menghapus dokumentasi", "Menyembunyikan kesalahan"], 0, "Pengujian memastikan aplikasi berjalan baik."], ["Saat memilih kata sandi, pilihan paling aman adalah…", ["Kombinasi unik yang sulit ditebak", "Nama sendiri saja", "Tanggal lahir saja", "Kata 'password'"], 0, "Kata sandi unik lebih sulit ditebak."], ["Jika sebuah program menerima data pengguna, prinsip penting adalah…", ["Mengumpulkan data seperlunya", "Mengambil semua data tanpa alasan", "Membagikan data otomatis", "Tidak memberi tahu pengguna"], 0, "Data sebaiknya dikumpulkan sesuai kebutuhan."], ["Sebuah keputusan pada flowchart biasanya membutuhkan…", ["Kondisi untuk menentukan jalur", "Warna khusus", "Nama file", "Ukuran layar"], 0, "Keputusan memilih jalur berdasarkan kondisi."], ["Untuk memastikan informasi akurat, kita sebaiknya…", ["Membandingkan beberapa sumber tepercaya", "Hanya membaca judul", "Mengikuti rumor", "Mengabaikan tanggal"], 0, "Verifikasi meningkatkan keandalan informasi."], ["Tahap terakhir setelah seluruh jembatan tantangan dilewati adalah…", ["Mengevaluasi hasil dan merayakan penyelesaian", "Kembali ke awal tanpa hasil", "Menghapus semua progres", "Mengabaikan pencapaian"], 0, "Evaluasi membantu memahami hasil belajar."]]}};
+let miniKey="",miniIndex=0,miniScore=0,miniLocked=false,miniClock=null,miniRemaining=0,miniStreak=0,miniCurrentQ=null;
+let miniScene=null,miniCamera=null,miniRenderer=null,miniAvatar=null,miniAnim=0,miniTick=0;let miniLane=0,miniJump=0,miniObstacles=[],miniClues=[],miniWorldMode="",miniLastHit=0,miniBridgeTiles=[],miniBridgePaths=[],miniOutcomeReady=false,miniFailed=false,miniGameOver=false;
+const miniThemes={jelajah:[0x80d5ff,0x59bd70,"🌴 PULAU DUNIA DIGITAL"],lari:[0x8bdcff,0x55b86a,"🏁 SIRKUIT KODING"],jatuh:[0x9cddff,0x68b978,"🧱 MENARA ALGORITMA"],detektif:[0x657ba8,0x607d75,"🕵️ KOTA DETEKTIF"],pasar:[0xffd18a,0x80bd68,"🏪 PASAR DATA NUSANTARA"],jembatan:[0x83caff,0x529d7c,"🌉 JEMBATAN JUARA"]};
+function mbox(w,h,d,c,x,y,z){
+ const mat=new THREE.MeshStandardMaterial({color:c,roughness:.82});
+ const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);o.position.set(x,y,z);miniScene.add(o);return o;
+}
+function miniLabel(text,x,y,z,color="#ffffff"){
+ const c=document.createElement("canvas");c.width=256;c.height=96;const ctx=c.getContext("2d");
+ ctx.fillStyle="rgba(7,18,39,.88)";ctx.beginPath();ctx.roundRect(8,8,240,80,18);ctx.fill();
+ ctx.strokeStyle="#d8e8ff";ctx.lineWidth=5;ctx.stroke();
+ ctx.fillStyle=color;ctx.font="bold 48px Arial";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(text,128,49);
+ const tex=new THREE.CanvasTexture(c);const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true}));
+ sp.position.set(x,y,z);sp.scale.set(2.2,.82,1);miniScene.add(sp);return sp;
+}
+function miniBuildAvatar(){
+ const g=new THREE.Group();
+ const skin=new THREE.MeshStandardMaterial({color:0xffc58e}),shirt=new THREE.MeshStandardMaterial({color:0x168be8}),pants=new THREE.MeshStandardMaterial({color:0x25375f}),hair=new THREE.MeshStandardMaterial({color:0x35251c}),shoe=new THREE.MeshStandardMaterial({color:0x202b42});
+ const torso=new THREE.Mesh(new THREE.BoxGeometry(.78,.9,.42),shirt);torso.position.y=1.55;g.add(torso);
+ const head=new THREE.Mesh(new THREE.BoxGeometry(.62,.62,.58),skin);head.position.y=2.38;g.add(head);
+ const cap=new THREE.Mesh(new THREE.BoxGeometry(.68,.16,.62),hair);cap.position.y=2.72;g.add(cap);
+ for(const x of [-.15,.15]){const eye=new THREE.Mesh(new THREE.BoxGeometry(.07,.08,.035),new THREE.MeshStandardMaterial({color:0x172033}));eye.position.set(x,2.4,.3);g.add(eye)}
+ const limbs={};
+ for(const x of [-.24,.24]){
+  const leg=new THREE.Group();leg.position.set(x,1.1,0);const lm=new THREE.Mesh(new THREE.BoxGeometry(.27,.72,.3),pants);lm.position.y=-.34;leg.add(lm);const sh=new THREE.Mesh(new THREE.BoxGeometry(.29,.16,.38),shoe);sh.position.set(0,-.7,.06);leg.add(sh);g.add(leg);limbs[x<0?"leftLeg":"rightLeg"]=leg;
+  const arm=new THREE.Group();arm.position.set(x*1.9,1.88,0);const am=new THREE.Mesh(new THREE.BoxGeometry(.22,.72,.25),skin);am.position.y=-.34;arm.add(am);g.add(arm);limbs[x<0?"leftArm":"rightArm"]=arm;
+ }
+ g.userData.limbs=limbs;g.position.set(0,0,3.5);miniScene.add(g);miniAvatar=g;
+}
+function miniPlatform(x,y,z,w=2.5,d=2.4,color=0x42c6d9){return mbox(w,.35,d,color,x,y,z)}
+function buildMini3D(key){
+ if(!window.THREE)return;
+ const theme=miniThemes[key]||miniThemes.jelajah,cv=$("mini3d");
+ if(!miniRenderer){miniRenderer=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:false});miniRenderer.setPixelRatio(Math.min(devicePixelRatio||1,1.7));miniRenderer.shadowMap.enabled=true;miniRenderer.shadowMap.type=THREE.PCFSoftShadowMap}
+ miniScene=new THREE.Scene();miniScene.background=new THREE.Color(theme[0]);miniScene.fog=new THREE.Fog(theme[0],30,75);
+ miniCamera=new THREE.PerspectiveCamera(52,1,.1,120);miniCamera.position.set(0,6.5,12);miniCamera.lookAt(0,1,0);
+ miniScene.add(new THREE.HemisphereLight(0xeaf6ff,0x35445d,1.7));
+ const sun=new THREE.DirectionalLight(0xffffff,2);sun.position.set(-7,13,8);sun.castShadow=true;miniScene.add(sun);
+ miniWorldObjects=[];miniObstacles=[];miniClues=[];miniBridgeTiles=[];miniLane=0;miniJump=0;miniWorldMode=key;miniWorldProgress=0;miniMotionBusy=false;miniOutcomeReady=false;miniFailed=false;
+ // Setiap tema memakai geometri dan jalur permainan berbeda, bukan arena generik.
+ if(key==="lari"){
+  mbox(15,.45,48,0x34465f,0, -.35,-13);
+  for(let x of [-5,0,5]){mbox(.12,.08,48,0xf7f2b8,x,-.08,-13)}
+  for(let i=0;i<10;i++){const lane=[-5,0,5][i%3],o=mbox(1.55,1.5,1.2,[0xf15b55,0xffc342,0x936cff][i%3],lane,.75,-7-i*5);miniObstacles.push(o)}
+  mbox(15,.3,1.2,0x24344d,0,1,-36);
+  for(let x of [-6.7,6.7])mbox(.5,3,.5,0xffb43b,x,1.5,-34);
+  miniLabel("START",0,2.8,5,"#7fffd4");miniLabel("FINISH",0,3,-35,"#ffe36e");
+ }else if(key==="jembatan"){
+  // Empat opsi pada setiap satu tahap. Tiap jawaban benar hanya membuka satu segmen berikutnya.
+  mbox(24,.3,62,0x14283d,0,-4,-27);
+  miniBridgePaths=[];miniBridgeTiles=[];
+  for(let lane=0;lane<4;lane++){
+   const x=-5.4+lane*3.6, path=[];
+   for(let step=0;step<10;step++){
+    const tile=mbox(2.8,.38,2.8,0x3f78c5,x,.1,2-step*4.2);
+    tile.userData.choice=lane;tile.userData.step=step;path.push(tile);
+    if(step===0){miniBridgeTiles.push(tile);miniLabel(String.fromCharCode(65+lane),x,1.05,1.5,"#ffffff")}
+   }
+   miniBridgePaths.push(path);
+  }
+  miniLabel("MULAI",0,2.5,5,"#8affd1");miniLabel("FINISH",0,2.5,-39,"#ffe36e");
+ }else if(key==="jatuh"){
+  mbox(18,.35,28,0x30485e,0,-.5,-10);
+  for(let i=0;i<10;i++){let x=[0,3,-3,0,3,-3,0,3,-3,0][i],y=.5+i*1.45,z=-i*2.3;miniPlatform(x,y,z,2.7,2.3,[0x16b9ce,0x3488ff,0x8d6bff,0xffbd43,0x30c98b][i%5]);miniLabel("LEVEL "+(i+1),x,y+.9,z,"#ffffff")}
+  mbox(2,1,2,0xffdf78,0,14.5,-23);
+ }else if(key==="detektif"){
+  mbox(32,.35,28,0x42576b,0,-.35,-5);
+  for(let i=0;i<7;i++){let x=-12+i*4,h=3+(i%3)*1.3;mbox(3,h,3,[0x43547d,0x596b9a,0x374866][i%3],x,h/2,-10);for(let yy=1;yy<h;yy+=1.2)mbox(.5,.45,.08,0xffd879,x,yy,-8.43)}
+  for(let i=0;i<10;i++){let clue=new THREE.Mesh(new THREE.OctahedronGeometry(.65),new THREE.MeshStandardMaterial({color:0xffe66b,emissive:0x795500}));clue.position.set(-9+i*6,1.2,1-i*3);miniScene.add(clue);miniClues.push(clue);miniLabel("BUKTI "+(i+1),-12+(i%7)*4,2.25,1-Math.floor(i/2)*5,"#ffec9b")}
+  mbox(2.5,3,.4,0x26374c,0,1.5,-16);miniLabel("KANTOR POLISI",0,4,-16,"#ffffff");
+ }else if(key==="pasar"){
+  mbox(28,.35,24,0xb5a17a,0,-.35,-4);
+  for(let i=0;i<10;i++){let x=-12+(i%5)*6,z=-8-Math.floor(i/5)*7;mbox(3.2,2.4,2.4,[0xf36b55,0x49b6a5,0xf2c34e,0x7c8cff,0x67a6e8][i],x,1.2,-8);mbox(3.6,.3,2.8,0x75452e,x,2.55,-8);mbox(.22,1.3,.22,0x75452e,x-1.45,1.5,-8);mbox(.22,1.3,.22,0x75452e,x+1.45,1.5,-8);miniLabel(["BUAH","BUKU","GADGET","ROTI","DATA"][i],x,3.3,-8,"#fff5d5")}
+  for(let i=0;i<10;i++){let coin=new THREE.Mesh(new THREE.CylinderGeometry(.38,.38,.13,20),new THREE.MeshStandardMaterial({color:0xffd34d,metalness:.55,roughness:.3}));coin.rotation.x=Math.PI/2;coin.position.set(-8+i*5,1,0);miniScene.add(coin);miniClues.push(coin)}
+ }else{
+  mbox(30,.35,34,0x4eaa72,0,-.35,-7);
+  for(let i=0;i<9;i++){let x=-13+i*3.3;mbox(.45,3,.45,0x805536,x,1.3,-8-(i%3)*4);let tr=new THREE.Mesh(new THREE.ConeGeometry(1.5,3.3,7),new THREE.MeshStandardMaterial({color:i%2?0x168c57:0x1d9b62}));tr.position.set(x,3.8,-8-(i%3)*4);miniScene.add(tr)}
+  for(let i=0;i<4;i++){miniPlatform(-5+i*3.3,.25,-3-i*4,2.4,2.2,0x46c9d7)}
+  mbox(3,4,.6,0x9b6bdb,0,2,-24);miniLabel("GERBANG",0,4.8,-24,"#fff");
+ }
+ miniBuildAvatar();
+ const r=cv.getBoundingClientRect(),w=Math.max(320,r.width),h=Math.max(200,r.height);miniRenderer.setSize(w,h,false);miniCamera.aspect=w/h;miniCamera.updateProjectionMatrix();
+ $("worldCaption").textContent=theme[2];if(!miniAnim)animateMini3D();
+}
+let miniWorldProgress=0,miniMotionBusy=false,miniWalkPhase=0;
+function miniTweenAvatar(target,duration=650,done){
+ if(!miniAvatar)return;miniMotionBusy=true;
+ const from=miniAvatar.position.clone(),to=new THREE.Vector3(target.x??from.x,target.y??from.y,target.z??from.z),start=performance.now();
+ const tick=now=>{const t=Math.min(1,(now-start)/duration),ease=t*t*(3-2*t);miniAvatar.position.lerpVectors(from,to,ease);miniWalkPhase+=.24;const limbs=miniAvatar.userData.limbs;if(limbs){limbs.leftLeg.rotation.x=Math.sin(miniWalkPhase)*.65*(1-t*.5);limbs.rightLeg.rotation.x=-Math.sin(miniWalkPhase)*.65*(1-t*.5);limbs.leftArm.rotation.x=-limbs.leftLeg.rotation.x;limbs.rightArm.rotation.x=-limbs.rightLeg.rotation.x}if(t<1)requestAnimationFrame(tick);else{if(limbs)Object.values(limbs).forEach(l=>l.rotation.x=0);miniMotionBusy=false;if(done)done()}};requestAnimationFrame(tick);
+}
+function moveMini(dir){
+ if(!miniAvatar||miniLocked||miniMotionBusy||miniGameOver)return;
+ const bounds=miniWorldMode==="jembatan"?[-5.4,5.4]:[-6,6];
+ const x=Math.max(bounds[0],Math.min(bounds[1],miniAvatar.position.x+dir*1.8));
+ miniLane=Math.round(x/1.8);miniTweenAvatar({x,y:miniAvatar.position.y,z:miniAvatar.position.z},220);
+}
+function jumpMini(){
+ if(!miniAvatar||miniLocked||miniMotionBusy||miniGameOver)return;
+ const y=miniAvatar.position.y;miniTweenAvatar({x:miniAvatar.position.x,y:y+1.5,z:miniAvatar.position.z-.5},260,()=>miniTweenAvatar({x:miniAvatar.position.x,y,z:miniAvatar.position.z-1},280));
+}
+function actionMini(){
+ if(miniLocked||miniMotionBusy)return;
+ if(miniWorldMode==="detektif"||miniWorldMode==="pasar")$("miniFeedback").textContent=miniWorldMode==="detektif"?"🔎 Dekati bukti bercahaya, lalu jawab pertanyaan untuk mengamankannya.":"🛒 Dekati kios, lalu jawab pertanyaan untuk menyelesaikan transaksi.";
+ else if(miniWorldMode==="jatuh")jumpMini();
+ else $("miniFeedback").textContent="Pilih jawaban untuk menentukan aksi karakter!";
+}
+function animateMini3D(){
+ if($("miniGame").style.display!=="flex"){miniAnim=0;return}
+ miniAnim=requestAnimationFrame(animateMini3D);miniTick+=.025;
+ if(miniAvatar&&!miniMotionBusy){
+  const limbs=miniAvatar.userData.limbs;
+  if(limbs&&(miniWorldMode==="lari"||miniWorldMode==="jatuh")){limbs.leftLeg.rotation.x=Math.sin(miniTick*9)*.12;limbs.rightLeg.rotation.x=-Math.sin(miniTick*9)*.12;limbs.leftArm.rotation.x=-limbs.leftLeg.rotation.x;limbs.rightArm.rotation.x=-limbs.rightLeg.rotation.x}
+ }
+ if(!miniGameOver&&miniWorldMode==="lari")miniObstacles.forEach(o=>{o.position.z+=.12;if(o.position.z>5){o.position.z=-42-Math.random()*8;o.position.x=[-5,0,5][Math.floor(Math.random()*3)]}});
+ if(!miniGameOver)miniClues.forEach((o,i)=>{o.rotation.y+=.035;o.position.y=(miniWorldMode==="detektif"?1.2:1)+Math.sin(miniTick*2+i)*.15});
+ if(miniAvatar&&miniCamera){const desired=new THREE.Vector3(miniAvatar.position.x*.35,miniAvatar.position.y+5.2,miniAvatar.position.z+10.5);miniCamera.position.lerp(desired,.08);miniCamera.lookAt(miniAvatar.position.x,miniAvatar.position.y+1,miniAvatar.position.z-3)}
+ if(miniRenderer&&miniScene)miniRenderer.render(miniScene,miniCamera);
+}
+document.addEventListener("keydown",e=>{
+ if($("miniGame").style.display!=="flex")return;
+ if(["ArrowLeft","a","A"].includes(e.key)){e.preventDefault();moveMini(-1)}
+ if(["ArrowRight","d","D"].includes(e.key)){e.preventDefault();moveMini(1)}
+ if(["ArrowUp"," ","w","W"].includes(e.key)){e.preventDefault();jumpMini()}
+ if(["e","E","Enter"].includes(e.key)){e.preventDefault();actionMini()}
+});
+function finishMiniOutcome(ok){
+ miniMotionBusy=false;
+ if(!ok){miniFailed=true;endMiniGame(false,"failed");return}
+ miniOutcomeReady=true;
+ $("miniNext").style.display="inline-block";
+ $("miniNext").textContent=miniIndex===miniSets[miniKey].items.length-1?"Selesaikan":"Lanjut satu tahap";
+}
+function playMiniAnswerOutcome(ok,choice){
+ if(!miniAvatar)return;
+ const start=miniAvatar.position.clone(),theme=miniKey;
+ const caption=t=>$("worldCaption").textContent=t;
+ const fail=(text,target)=>{caption(text);miniMotionBusy=true;miniTweenAvatar(target,520,()=>finishMiniOutcome(false))};
+ const advance=(text,target,after)=>{caption(text);miniMotionBusy=true;miniTweenAvatar(target,650,()=>{if(after)after();finishMiniOutcome(true)})};
+ if(theme==="lari"){
+  if(ok){
+   const safeLane=(miniIndex%2===0)?-5:5;
+   // Bergerak lateral nyata ke jalur aman, kemudian maju hanya satu rintangan.
+   advance("🏃 JALUR AMAN! BERHASIL MENGHINDAR",{
+    x:safeLane,y:0,z:Math.max(-34,start.z-4.2)
+   },()=>{miniAvatar.rotation.set(0,0,0);miniWorldProgress++});
+  }else{
+   caption("💥 MENABRAK RINTANGAN — PERMAINAN SELESAI");
+   miniMotionBusy=true;
+   miniTweenAvatar({x:start.x,y:.2,z:start.z+.65},300,()=>{
+    miniAvatar.rotation.z=.65;
+    miniTweenAvatar({x:start.x,y:-.1,z:start.z+.9},300,()=>finishMiniOutcome(false));
+   });
+  }
+ }else if(theme==="jembatan"){
+  const path=miniBridgePaths[choice],tile=path&&path[Math.min(miniIndex,9)];
+  if(ok&&tile){
+   caption("🌉 KOTAK "+String.fromCharCode(65+choice)+" BENAR — SATU PIJAKAN AMAN");
+   miniBridgePaths.forEach((p,l)=>{p.forEach(t=>{if(t.userData.step===miniIndex){t.material.color.setHex(l===choice?0x29c878:0x3f78c5);t.material.emissive.setHex(l===choice?0x14552a:0x000000)}})});
+   advance("🌉 MENYEBERANG KE PIJAKAN "+(miniIndex+1),{x:tile.position.x,y:1.15,z:tile.position.z+.1},()=>{miniWorldProgress++;miniAvatar.rotation.set(0,0,0)});
+  }else{
+   if(tile){tile.material.color.setHex(0xe34d55);tile.position.y=-2.2}
+   caption("🕳️ KOTAK "+String.fromCharCode(65+choice)+" SALAH — PAPAN RUNTUH");
+   miniMotionBusy=true;
+   miniTweenAvatar({x:tile?tile.position.x:start.x,y:-4,z:tile?tile.position.z:start.z},620,()=>finishMiniOutcome(false));
+  }
+ }else if(theme==="jatuh"){
+  if(ok){
+   const level=miniIndex+1,x=[0,3,-3,0,3,-3,0,3,-3,0][miniIndex],z=-miniIndex*2.3,y=1.45+miniIndex*1.45;
+   advance("🧱 LEVEL "+level+" BERHASIL DICAPAI!",{x,y,z},()=>{miniWorldProgress=level;miniAvatar.rotation.set(0,0,0)});
+  }else{
+   caption("⬇️ SALAH — JATUH DARI PLATFORM. PERMAINAN SELESAI");
+   miniMotionBusy=true;miniTweenAvatar({x:start.x,y:-5,z:start.z},650,()=>finishMiniOutcome(false));
+  }
+ }else if(theme==="detektif"){
+  if(ok){
+   const o=miniClues[miniIndex%Math.max(1,miniClues.length)];
+   advance("🔎 BUKTI "+(miniIndex+1)+" BERHASIL DIKUMPULKAN",{x:o?o.position.x:start.x,y:0,z:o?o.position.z+2:start.z-2},()=>{if(o)o.visible=false;miniWorldProgress++});
+  }else{
+   caption("🗞️ PETUNJUK SALAH — INVESTIGASI GAGAL");
+   miniAvatar.rotation.y+=Math.PI/5;miniMotionBusy=true;
+   miniTweenAvatar({x:start.x,y:start.y,z:start.z+.3},350,()=>finishMiniOutcome(false));
+  }
+ }else if(theme==="pasar"){
+  if(ok){
+   const o=miniClues[miniIndex%Math.max(1,miniClues.length)];
+   advance("🪙 TRANSAKSI BERHASIL — BARANG DIBELI",{x:o?o.position.x:start.x,y:0,z:o?o.position.z+2:start.z-2},()=>{if(o)o.visible=false;miniWorldProgress++});
+  }else{
+   caption("🧾 TRANSAKSI DITOLAK — PERMAINAN SELESAI");
+   miniMotionBusy=true;miniTweenAvatar({x:start.x,y:start.y,z:start.z+.2},350,()=>finishMiniOutcome(false));
+  }
+ }else{
+  if(ok)advance("🌴 GERBANG TERBUKA — AREA BERIKUTNYA",{x:start.x+(miniIndex%2?3:-3),y:0,z:start.z-4},()=>{miniWorldProgress++});
+  else{
+   caption("🔒 GERBANG TERKUNCI — PERMAINAN SELESAI");
+   miniMotionBusy=true;miniTweenAvatar({x:start.x,y:start.y,z:start.z+.2},350,()=>finishMiniOutcome(false));
+  }
+ }
+}
+function openMiniGame(key){
+ const set=miniSets[key];if(!set)return;
+ if(!onlineSessionReady){alert("🔒 Mini game belum dapat dimainkan. Isi nama siswa lalu tekan Gabung Ruang Online dan tunggu status 🟢 Terhubung.");return;}
+ if(miniPlayed.has(key)){alert("Mini game ini sudah pernah dimainkan. Silakan pilih mini game lain yang belum dimainkan.");return;}clearInterval(miniClock);miniKey=key;miniIndex=0;miniScore=0;miniStreak=0;miniLocked=false;miniOutcomeReady=false;miniFailed=false;miniGameOver=false;miniWorldProgress=0;
+ $("miniTitle").textContent=set.title;$("miniMode").textContent=set.mode;$("miniPoints").textContent="0";
+ $("miniTimer").style.display=set.time?"inline-block":"none";$("miniGame").style.display="flex";$("worldHint").textContent=({lari:"⬅ ➡ Hindari rintangan • ⬆ Lompat",jatuh:"⬅ ➡ Bergerak • ⬆ Lompat",detektif:"⬅ ➡ Cari petunjuk • ✨ Periksa",pasar:"⬅ ➡ Jelajahi kios • ✨ Aksi",jembatan:"⬅ ➡ Bergerak • ✨ Maju",jelajah:"⬅ ➡ Jelajahi pulau • ✨ Aksi"})[key];requestAnimationFrame(()=>buildMini3D(key));
+ if(set.time){miniRemaining=set.time;tickMiniTimer();miniClock=setInterval(()=>{miniRemaining--;tickMiniTimer();if(miniRemaining<=0)endMiniGame("timeout")},1000)}
+ showMiniQuestion();
+ $("miniFeedback").textContent=({lari:"🏃 Jawab soal dengan benar agar avatar menghindari rintangan dan berlari maju. Jawaban salah membuat avatar menabrak.",jatuh:"🧱 Gerakkan avatar dan lompat untuk melewati platform.",detektif:"🕵️ Jelajahi kota dan tekan Aksi untuk memeriksa petunjuk.",pasar:"🏪 Jelajahi kios dengan tombol arah dan tekan Aksi.",jembatan:"🌉 Pilih A, B, C, atau D. Hanya pijakan dengan jawaban benar yang aman untuk diseberangi.",jelajah:"🌴 Jelajahi pulau digital dengan tombol arah."})[key];
+}
+function tickMiniTimer(){$("miniTimer").textContent="⏱️ "+miniRemaining+" detik"}
+function showMiniQuestion(){
+ const set=miniSets[miniKey];if(!set)return;
+ if(miniIndex>=set.items.length){endMiniGame("success");return}
+ miniLocked=false;miniOutcomeReady=false;miniCurrentQ=shuffleQuestion(set.items[miniIndex]);const q=miniCurrentQ;$("miniCount").textContent=`Tantangan ${miniIndex+1} dari ${set.items.length} • 🔥 Streak ${miniStreak}`;
+ $("miniQuestion").textContent=q.prompt;$("miniFeedback").textContent="";$("miniNext").style.display="none";
+ $("miniBar").style.width=(miniIndex/set.items.length*100)+"%";$("miniChoices").innerHTML="";
+ q.options.forEach((choice,i)=>{const b=document.createElement("button");b.className="choice";b.textContent=String.fromCharCode(65+i)+". "+choice;b.onclick=()=>answerMini(i,b);$("miniChoices").appendChild(b)});
+}
+
+function answerMini(choice,btn){
+ if(miniLocked)return;miniLocked=true;miniOutcomeReady=false;const q=miniCurrentQ,ok=choice===q.correct;playMiniAnswerOutcome(ok,choice);
+ [...$("miniChoices").children].forEach((b,i)=>{b.disabled=true;if(i===q.correct)b.classList.add("correct")});
+ if(!ok){btn.classList.add("wrong");miniStreak=0}else{miniStreak++;const bonus=miniKey==="jembatan"&&miniStreak>=3?5:0;miniScore+=5+bonus;score+=5+bonus;$("miniPoints").textContent=miniScore;$("miniStreak").textContent=miniStreak;update();if(socket?.connected)socket.emit("score-update",score)}
+ window.kkaAnswered=(window.kkaAnswered||0)+1;if(ok)window.kkaCorrect=(window.kkaCorrect||0)+1;
+ $("miniStreak").textContent=miniStreak;
+ const outcome=({lari:ok?"🏃 Avatar berlari melewati rintangan!":"💥 Avatar menabrak rintangan!",jembatan:ok?"🌉 Kotak "+String.fromCharCode(65+choice)+" benar! Pijakan aman, avatar menyeberang.":"🕳️ Kotak "+String.fromCharCode(65+choice)+" salah! Pijakan runtuh dan avatar jatuh.",jatuh:ok?"🧱 Lompatan berhasil, naik ke platform!":"⬇️ Avatar jatuh dari platform!",detektif:ok?"🔎 Bukti ditemukan dan kasus makin jelas!":"🗞️ Petunjuk tidak cocok, periksa kembali!",pasar:ok?"🪙 Transaksi berhasil, barang didapat!":"🧾 Perhitungan salah, transaksi ditolak!",jelajah:ok?"🌴 Jalur petualangan terbuka!":"🧭 Jalur belum tepat, coba lagi!"})[miniKey];
+ $("miniFeedback").textContent=outcome+" "+q.explain+(ok&&miniKey==="jembatan"&&miniStreak>=3?" Bonus +5!":"");
+ $("miniNext").style.display="none";
+ sendProgress();
+}
+function miniNext(){if(!miniLocked||miniMotionBusy||!miniOutcomeReady)return;miniOutcomeReady=false;miniIndex++;showMiniQuestion()}
+function endMiniGame(status,reason){
+ clearInterval(miniClock);miniClock=null;const set=miniSets[miniKey];miniGameOver=true;
+ const success=status==="success";
+ const failed=status==="failed"||reason==="failed";
+ // Satu mini game hanya boleh dimainkan satu kali, baik berhasil, gagal, maupun kehabisan waktu.
+ miniPlayed.add(miniKey);miniResults[miniKey]=success?"success":failed?"failed":"timeout";saveMiniPlayed();renderMiniGameCards();
+ if(success){miniDone.add(miniKey);update()}else{update()}
+ sendProgress();$("miniBar").style.width="100%";
+ $("miniCount").textContent=success?"MISI SELESAI!":failed?"GAME OVER":"WAKTU HABIS!";
+ $("miniQuestion").textContent=success?"🏆 Hebat! Semua tahap berhasil diselesaikan.":failed?"💥 Permainan berakhir karena jawaban salah. Mini game ini telah selesai dimainkan. Pilih tantangan lain yang belum dimainkan.":"⏱️ Waktu habis. Coba ulangi permainan dari awal.";
+ const statusText=success?"🏆 KEMENANGAN":failed?"💥 GAGAL":"⏱️ WAKTU HABIS";
+ const remaining=6-miniPlayed.size;
+ $("miniChoices").innerHTML=`<div class="panel"><h2>${statusText}</h2><h3>⭐ Kamu mendapat ${miniScore} poin</h3><p class="muted">${set.title} • Progres ${miniIndex+(success?0:1)} dari ${set.items.length} tahap.</p><p class="muted">${success?"Mini game berhasil diselesaikan dan sekarang terkunci.":failed?"Kesempatan mini game ini sudah digunakan. Game dikunci agar kamu melanjutkan ke tantangan lain.":"Waktu mini game habis. Game ini sudah ditandai dimainkan."}</p><h3>🎮 ${remaining} mini game belum dimainkan</h3><button class="choice" onclick="closeMiniGame();document.getElementById('games').scrollIntoView({behavior:'smooth'});">🗺️ Pilih Mini Game Berikutnya</button></div>`;
+ $("miniFeedback").textContent=success?"Hebat! Mini game ini sudah selesai. Silakan pilih game lain yang belum dimainkan.":failed?"Game over! Mini game ini dikunci. Silakan pilih game lain yang belum dimainkan.":"Waktu habis! Mini game ini dikunci. Silakan pilih game lain yang belum dimainkan.";
+ $("miniNext").style.display="none";
+ if(socket?.connected){socket.emit("score-update",score);sendProgress()}
+}
+function closeMiniGame(){clearInterval(miniClock);miniClock=null;$("miniGame").style.display="none";if(miniAnim){cancelAnimationFrame(miniAnim);miniAnim=0}miniMotionBusy=false}
+
+window.addEventListener("resize",()=>{if(miniRenderer&&miniCamera&&$("miniGame").style.display==="flex"){let r=$("mini3d").getBoundingClientRect();miniRenderer.setSize(Math.max(320,r.width),Math.max(200,r.height),false);miniCamera.aspect=r.width/r.height;miniCamera.updateProjectionMatrix()}});renderMissions();renderMiniGameCards();init3D();
+</script></body></html>
