@@ -16,6 +16,10 @@ h2{font-size:18px;margin:0 0 10px}.muted{color:var(--muted);font-size:13px;line-
 .progress{height:8px;background:#30415f;border-radius:20px;overflow:hidden;margin:8px 0}.progress i{display:block;height:100%;background:var(--green);width:0}
 #toast{min-height:24px;color:var(--gold);font-weight:700}.controls{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
 input{background:#101a30;color:white;border:1px solid var(--line);border-radius:9px;padding:10px;width:100%;margin:5px 0}
+
+/* Layar awal pemilihan peran */
+#roleGate{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(circle at 20% 10%,#315a9b 0,transparent 35%),radial-gradient(circle at 85% 15%,#6a357f 0,transparent 30%),#080f22}
+.roleBox{width:min(760px,100%);padding:30px;border:1px solid #5875ad;border-radius:28px;background:linear-gradient(145deg,#172b50,#171936);box-shadow:0 25px 80px #0009;text-align:center}.roleBox h1{margin:0 0 8px;font-size:clamp(26px,5vw,42px)}.roleChoices{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px}.roleCard{border:1px solid #5570a5;border-radius:22px;padding:24px;background:#101d37;color:white;cursor:pointer;text-align:left}.roleCard:hover{transform:translateY(-4px);border-color:#a9c8ff}.roleIcon{font-size:48px;display:block;margin-bottom:10px}.studentForm{display:none;margin-top:20px;text-align:left}.studentForm.show{display:block}.studentForm label{display:block;margin-top:8px}.studentActions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}.roleHint{color:#b8c7e3;line-height:1.5}@media(max-width:620px){.roleChoices{grid-template-columns:1fr}.roleBox{padding:20px}}
 @media(max-width:760px){#app{padding:10px}.layout{grid-template-columns:1fr}canvas{height:340px}.brand{min-width:100%}.top{border-radius:15px}.stat{flex:1;text-align:center}}
 
 .gamehub{margin:12px 0 14px;background:linear-gradient(125deg,#1b3156f5,#1c2147f5);border-color:#536ca0}.gamehub h2{font-size:21px}.gamegrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
@@ -34,6 +38,10 @@ input{background:#101a30;color:white;border:1px solid var(--line);border-radius:
 
 .miniWorld{height:340px;position:relative;overflow:hidden;border-radius:16px;border:2px solid #5579b8;background:linear-gradient(#77c9ff,#d8f4ff);box-shadow:inset 0 -30px 60px #0a1b3a55}#mini3d{width:100%;height:100%;display:block}.worldCaption{position:absolute;left:12px;bottom:10px;padding:7px 11px;border-radius:10px;background:#07152bd9;color:#fff;font-size:12px;font-weight:900}.worldHint{position:absolute;right:12px;top:10px;padding:7px 10px;border-radius:10px;background:#07152bd9;color:#fff;font-size:11px}.miniPlayArea{display:grid;grid-template-columns:1.1fr .9fr;gap:14px;margin-top:12px}.miniQuestionCard,.miniAnswerCard{background:linear-gradient(145deg,#1b3157,#101d39);border:1px solid #405d91;border-radius:15px;padding:14px}.miniAnswerCard .choice{margin:5px 0;padding:11px;border-radius:12px;font-weight:750}.miniControls{position:absolute;right:12px;bottom:10px;display:flex;gap:6px}.miniControls button{border:1px solid #ffffff88;background:#14284be8;color:white;border-radius:10px;padding:9px 13px;font-weight:900;min-width:42px;touch-action:manipulation}.miniControls button:active{transform:translateY(2px);background:#2878ef}@media(max-width:700px){.miniWorld{height:245px}.miniPlayArea{grid-template-columns:1fr;gap:8px}.miniBox{padding:10px}}
 
+
+/* Layar awal pemilihan peran */
+#roleGate{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(circle at 20% 10%,#315a9b 0,transparent 35%),radial-gradient(circle at 85% 15%,#6a357f 0,transparent 30%),#080f22}
+.roleBox{width:min(760px,100%);padding:30px;border:1px solid #5875ad;border-radius:28px;background:linear-gradient(145deg,#172b50,#171936);box-shadow:0 25px 80px #0009;text-align:center}.roleBox h1{margin:0 0 8px;font-size:clamp(26px,5vw,42px)}.roleChoices{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px}.roleCard{border:1px solid #5570a5;border-radius:22px;padding:24px;background:#101d37;color:white;cursor:pointer;text-align:left}.roleCard:hover{transform:translateY(-4px);border-color:#a9c8ff}.roleIcon{font-size:48px;display:block;margin-bottom:10px}.studentForm{display:none;margin-top:20px;text-align:left}.studentForm.show{display:block}.studentForm label{display:block;margin-top:8px}.studentActions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}.roleHint{color:#b8c7e3;line-height:1.5}@media(max-width:620px){.roleChoices{grid-template-columns:1fr}.roleBox{padding:20px}}
 @media(max-width:760px){.gamegrid{grid-template-columns:repeat(2,minmax(0,1fr))}.gamecard{min-height:150px}}
 @media(max-width:420px){.gamegrid{grid-template-columns:1fr 1fr}.gamecard{padding:10px}.gamecard b{font-size:14px}.gamecard small{font-size:11px}}
 
@@ -45,7 +53,8 @@ input{background:#101a30;color:white;border:1px solid var(--line);border-radius:
 .onlineLockBadge{display:inline-block;margin-top:8px;padding:5px 8px;border-radius:7px;background:#4a2740;color:#ffe0ef;font-size:10px;font-weight:900;letter-spacing:.3px}
 </style>
 </head>
-<body><div id="app">
+<body>
+<div id="roleGate"><div class="roleBox"><div style="font-size:52px">🚀</div><h1>KKA ADVENTURE</h1><p class="roleHint">Pilih cara masuk sebelum memulai permainan.</p><div class="roleChoices"><button class="roleCard" type="button" onclick="chooseRole('student')"><span class="roleIcon">🎒</span><b>Masuk sebagai Murid</b><p class="roleHint">Masukkan nama, pilih ruang kelas, lalu bergabung bermain online.</p></button><button class="roleCard" type="button" onclick="chooseRole('teacher')"><span class="roleIcon">👩‍🏫</span><b>Masuk sebagai Guru</b><p class="roleHint">Buka dashboard untuk memantau siswa yang sedang bermain secara realtime.</p></button></div><div id="studentStart" class="studentForm"><h2>🎒 Data Murid</h2><label>Nama siswa</label><input id="gateName" maxlength="18" placeholder="Masukkan nama siswa"><label>Kode ruang kelas</label><input id="gateRoom" maxlength="20" value="KELAS10" placeholder="Contoh: KELAS10"><div class="studentActions"><button class="btn green" type="button" onclick="startStudent()">Gabung & Mulai Bermain</button><button class="btn secondary" type="button" onclick="backRole()">Kembali</button></div><p id="gateMsg" class="roleHint"></p></div></div></div><div id="app">
 <div class="top"><div class="brand">🚀 KKA ADVENTURE <span style="color:#ffc857">| KELAS X FASE E</span></div><div class="stat">⭐ Skor: <b id="score">0</b></div><div class="stat">🎮 Dimainkan: <b id="miniDoneCount">0/6</b></div><div class="stat">🏆 Berhasil: <b id="miniSuccessCount">0/6</b></div><div class="stat">🏅 Level: <b id="level">1</b></div><div class="stat">👥 Online: <b id="onlineCount">1</b></div><button class="btn secondary" onclick="showHelp()">Petunjuk</button></div>
 
 <div class="panel gamehub">
@@ -153,6 +162,22 @@ function renderMiniGameCards(){
 }
 function shuffleQuestion(q){const opts=q[1].map((text,index)=>({text,index}));for(let i=opts.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[opts[i],opts[j]]=[opts[j],opts[i]];}return {prompt:q[0],options:opts.map(o=>o.text),correct:opts.findIndex(o=>o.index===q[2]),explain:q[3]};}
 const $=id=>document.getElementById(id);
+function chooseRole(role){
+  if(role==='teacher'){ window.location.href='/teacher.html'; return; }
+  $('studentStart').classList.add('show'); $('gateName').focus();
+}
+function backRole(){ $('studentStart').classList.remove('show'); $('gateMsg').textContent=''; }
+function startStudent(){
+  const n=$('gateName').value.trim(); const r=$('gateRoom').value.trim();
+  if(!n){ $('gateMsg').textContent='⚠️ Silakan masukkan nama siswa terlebih dahulu.'; $('gateName').focus(); return; }
+  $('playerName').value=n; $('roomCode').value=r||'KELAS10';
+  $('roleGate').style.display='none';
+  saveName();
+  setTimeout(()=>$('joinOnline').click(),100);
+}
+
+
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&$('roleGate')&&$('roleGate').style.display!=='none'&&$('studentStart').classList.contains('show'))startStudent();});
 function sendProgress(){if(socket?.connected)socket.emit("student-progress",{done:[...done],miniDone:[...miniDone],currentMission:active>=0?topics[active].n:"-",answered:window.kkaAnswered||0,correct:window.kkaCorrect||0});}
 function update(){ $("score").textContent=score;$("level").textContent=1+Math.floor(score/60);$("miniDoneCount").textContent=miniPlayed.size+"/6 dimainkan";const _msc=$("miniSuccessCount");if(_msc)_msc.textContent=Object.values(miniResults).filter(v=>v==="success").length+"/6";$("done").textContent=done.size+" dari 6 misi selesai";$("bar").style.width=(done.size/6*100)+"%";renderMissions();renderMiniGameCards()}
 function renderMissions(){$("missions").innerHTML=topics.map((t,i)=>`<div class="mission"><span class="emoji">${t.e}</span><div><b>${i+1}. ${t.n}</b><div class="muted">${t.desc}</div></div><button class="btn ${done.has(i)?"green":"secondary"}" onclick="startMission(${i})">${done.has(i)?"Ulangi":"Misi"}</button></div>`).join("")}
